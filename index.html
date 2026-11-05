@@ -7,6 +7,35 @@
     <title>Robot Tien-Anh Duy-Anh</title>
     <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
     <script>eruda.init();</script>
+
+    <!-- 1. BỘ KHÓA ÂM LƯỢNG ỔN ĐỊNH CHO IPHONE/SAFARI -->
+    <script>
+      (function() {
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          const originalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+          
+          navigator.mediaDevices.getUserMedia = function(constraints) {
+            if (constraints && constraints.audio) {
+              // Ép tắt Auto Gain Control để máy không tự động tăng giảm âm lượng lúc to lúc nhỏ
+              if (typeof constraints.audio === 'object') {
+                constraints.audio.autoGainControl = false;
+                constraints.audio.echoCancellation = true;
+                constraints.audio.noiseSuppression = true;
+              } else {
+                constraints.audio = {
+                  autoGainControl: false,
+                  echoCancellation: true,
+                  noiseSuppression: true
+                };
+              }
+            }
+            return originalGetUserMedia(constraints);
+          };
+        }
+      })();
+    </script>
+
+    <!-- 2. GỌI CÁC FILE CHÍNH CỦA ỨNG DỤNG -->
     <script type="module" crossorigin src="/Robot_-Tien-Anh_Duy-Anh/assets/index-C12viJvA.js"></script>
     <link rel="stylesheet" crossorigin href="/Robot_-Tien-Anh_Duy-Anh/assets/index-oToshzxo.css">
   </head>
