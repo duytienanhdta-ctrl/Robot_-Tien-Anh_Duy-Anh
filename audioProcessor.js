@@ -2,7 +2,7 @@ class AudioProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
         // Nguong am luong de loc tieng im lang (tu 0.015 den 0.03 la chuan nhat)
-        this.silenceThreshold = 0.02;
+        this.silenceThreshold = 0.035;
     }
 
     // Xu ly du lieu am thanh thu tu micro
