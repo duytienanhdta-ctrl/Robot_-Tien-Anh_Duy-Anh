@@ -1,7 +1,7 @@
 class AudioProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
-        this.silenceThreshold = 0.025;
+        this.silenceThreshold = 0.08;
         this.isBotSpeaking = false;
 
         // Lắng nghe tín hiệu trạng thái từ luồng chính (khi bot đang phát loa)
