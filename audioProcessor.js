@@ -1,28 +1,37 @@
 class AudioProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
-        // Nguong am luong de loc tieng im lang (tu 0.015 den 0.03 la chuan nhat)
-        this.silenceThreshold = 0.035;
+        this.silenceThreshold = 0.025;
+        this.isBotSpeaking = false;
+
+        // Lắng nghe tín hiệu trạng thái từ luồng chính (khi bot đang phát loa)
+        this.port.onmessage = (event) => {
+            if (event.data && typeof event.data.isBotSpeaking !== 'undefined') {
+                this.isBotSpeaking = event.data.isBotSpeaking;
+            }
+        };
     }
 
-    // Xu ly du lieu am thanh thu tu micro
     process(inputs) {
+        // Nếu bot đang nói, chặn hoàn toàn micro để không bị tiếng loa dội ngược gây ngắt câu
+        if (this.isBotSpeaking) {
+            return true;
+        }
+
         const input = inputs[0][0];
         if (!input) return true;
 
-        // Tinh nang luong am thanh (do lon cua am thanh) hien tai
         let sum = 0;
         for (let i = 0; i < input.length; i++) {
             sum += input[i] * input[i];
         }
         const rms = Math.sqrt(sum / input.length);
 
-        // Neu am luong nho hon nguong (dang im lang hoac chi co tieng gio nhe), bo qua khong gui
+        // Bỏ qua tạp âm và khoảng lặng
         if (rms < this.silenceThreshold) {
             return true;
         }
 
-        // Chi khi co nguoi noi that su thi moi dong goi va gui di
         const audioData = new Float32Array(input);
         this.port.postMessage(audioData, [audioData.buffer]);
 
