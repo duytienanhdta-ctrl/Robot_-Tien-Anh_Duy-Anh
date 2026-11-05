@@ -1,19 +1,29 @@
 class AudioProcessor extends AudioWorkletProcessor {
     constructor() {
         super();
+        // Nguong am luong de loc tieng im lang (tu 0.015 den 0.03 la chuan nhat)
+        this.silenceThreshold = 0.02;
     }
 
-    // 处理节点的内部逻辑
+    // Xu ly du lieu am thanh thu tu micro
     process(inputs) {
-        // inputs[0] 代表第一个输入通道
-        // inputs[0][0] 代表第一个输入通道的第一个声道（单声道音频）
         const input = inputs[0][0];
         if (!input) return true;
 
-        // 创建新的 Float32Array 并复制数据
-        const audioData = new Float32Array(input);
+        // Tinh nang luong am thanh (do lon cua am thanh) hien tai
+        let sum = 0;
+        for (let i = 0; i < input.length; i++) {
+            sum += input[i] * input[i];
+        }
+        const rms = Math.sqrt(sum / input.length);
 
-        // 发送音频数据至主线程的 port.onmessage
+        // Neu am luong nho hon nguong (dang im lang hoac chi co tieng gio nhe), bo qua khong gui
+        if (rms < this.silenceThreshold) {
+            return true;
+        }
+
+        // Chi khi co nguoi noi that su thi moi dong goi va gui di
+        const audioData = new Float32Array(input);
         this.port.postMessage(audioData, [audioData.buffer]);
 
         return true;
